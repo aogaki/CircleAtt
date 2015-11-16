@@ -38,7 +38,6 @@ private:
    G4VPhysicalVolume *fAirGapPV;
    G4VPhysicalVolume *fPlatePV;
    G4VPhysicalVolume *fCellPV;
-   G4VPhysicalVolume *fAttPV;
 
    // Materials
    void DefineMaterial();
@@ -68,10 +67,12 @@ private:
    G4double fAirGapW;
    G4double fAirGapT;
 
-   G4LogicalVolume *ConstructAtt();
-   G4double fAttL;
-   G4double fAttW;
-   G4double fAttT;
+   void ReadAttData();
+   G4LogicalVolume *ConstructAtt(G4double, G4double);
+   static const G4int kAtt = 75;
+   G4double fAttT[kAtt];
+   G4double fAttH; // sum of fAttT
+   G4VPhysicalVolume *fAttPV[kAtt];
 
    G4LogicalVolume *ConstructCell();
    G4double fCellL;

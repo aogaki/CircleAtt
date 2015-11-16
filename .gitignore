@@ -14,5 +14,6 @@ Makefile
 *.d
 *~
 tmp.*
+result*.root
 Makefile
 
