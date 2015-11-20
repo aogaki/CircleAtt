@@ -9,11 +9,17 @@
 BIRunAction::BIRunAction()
    : G4UserRunAction()
 {
-    G4AnalysisManager *anaMan = G4AnalysisManager::Instance();
-    anaMan->SetVerboseLevel(1);
+   G4AnalysisManager *anaMan = G4AnalysisManager::Instance();
+   anaMan->SetVerboseLevel(1);
     
-    anaMan->CreateH2("HisPlate", "Deposited Energy",
-                     12, -0.5, 11.5, 8, -0.5, 7.5);
+   G4double cellR = 6.39 / 2.;
+   G4double cellPitch = 9.;
+   G4double cellL = cellR * 2 + cellPitch * 11;
+   G4double cellW = cellR * 2 + cellPitch * 7;
+    
+   anaMan->CreateH2("HisPlate", "Deposited Energy",
+                    G4int(cellL * 10), -cellL / 2., cellL / 2,
+                    G4int(cellW * 10), -cellW / 2., cellW / 2);
 }
 
 BIRunAction::~BIRunAction()

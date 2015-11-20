@@ -54,20 +54,13 @@ void BIEventAction::EndOfEventAction(const G4Event *event)
 
    G4AnalysisManager *anaMan = G4AnalysisManager::Instance();
 
-   G4double cellPitch = 9.*mm;
-   
    const G4int kHit = hitsCollection->entries();
    for (G4int iHit = 0; iHit < kHit; iHit++) {
       BICommonHit *newHit = (*hitsCollection)[iHit];
-
       G4double depositEnergy = newHit->GetDepositEnergy();
-
       G4ThreeVector position = newHit->GetPosition();
-
-      G4int xPos = G4int((position.x() + 6*cellPitch) / cellPitch);
-      G4int yPos = G4int((position.y() + 4*cellPitch) / cellPitch);
       
-      anaMan->FillH2(0, xPos, yPos, depositEnergy);
+      anaMan->FillH2(0, position.x() / mm, position.y() / mm, depositEnergy);
       
    }
 
