@@ -326,7 +326,7 @@ void BIDetectorConstruction::ReadAttData()
    while(1){
       fin >> buf;
       if(it >= kAtt || fin.eof()) break;
-      fAttT[it] = stol(buf)*um*60;
+      fAttT[it] = stol(buf)*um;
       G4cout << buf <<"\t"<< fAttT[it] << G4endl;
       if(fAttT[it] > fAttH) fAttH = fAttT[it];
       it++;
