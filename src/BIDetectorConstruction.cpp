@@ -20,6 +20,7 @@
 #include "G4UImanager.hh"
 #include "G4UnionSolid.hh"
 #include "G4SubtractionSolid.hh"
+#include "G4IntersectionSolid.hh"
 
 #include "BIDetectorConstruction.hpp"
 #include "BICommonSD.hpp"
@@ -29,15 +30,19 @@ BIDetectorConstruction::BIDetectorConstruction(G4String name)
    : G4VUserDetectorConstruction(),
      fWorldLV(nullptr),
      fWindowPV(nullptr),
+     fCassettePV(nullptr),
      fAirGapPV(nullptr),
      fPlatePV(nullptr),
      fCellPV(nullptr),
+     fWaterPV(nullptr),
      fVacuum(nullptr),
      fAir(nullptr),
      fWindowMat(nullptr),
+     fCassetteMat(nullptr),
      fPlateMat(nullptr),
      fCellMat(nullptr),
-     fAttMat(nullptr)
+     fAttMat(nullptr),
+     fWaterMat(nullptr)
 {
    fCheckOverlap = true;
    fInName = name;
@@ -60,19 +65,29 @@ void BIDetectorConstruction::DefineGeoPar()
    fPlateW = 82.4*mm;
    fPlateT = 1.*mm;
    
-   fWindowL = 150.*mm;
-   fWindowW = 150.*mm;
-   fWindowT = 0.1*mm;
+   fWindowL = fPlateL;
+   fWindowW = fPlateW;
+   fWindowT = 1.*mm;
 
-   fAirGapL = 150.*mm;
-   fAirGapW = 150.*mm;
-   fAirGapT = 5.*mm;
+   fCassetteL = 163.6*mm; // temporary
+   fCassetteW = 118.4*mm; // temporary
+   fCassetteH = 30.*mm; // temporary
+   fCassetteBottomT = 3.*mm; // temporary
 
    fCellR = 6.39*mm / 2.;
    fCellPitch = 9.*mm;
    fCellL = fCellR * 2 + fCellPitch * 11;
    fCellW = fCellR * 2 + fCellPitch * 7;
    fCellT = 20.*um;
+
+   fWaterL = fCellL;
+   fWaterW = fCellW;
+   fWaterT = 10.9*mm - fCellT;
+
+   fAirGapL = fPlateL;
+   fAirGapW = fPlateW;
+   //fAirGapT = 5.*mm;
+   fAirGapT = (2 * 5.*mm) + fWaterT + fCellT + fPlateT;
 }
 
 void BIDetectorConstruction::DefineMaterial()
@@ -83,11 +98,13 @@ void BIDetectorConstruction::DefineMaterial()
    fVacuum = manager->FindOrBuildMaterial("G4_Galactic");
    fAir = manager->FindOrBuildMaterial("G4_AIR");
    fWindowMat = manager->FindOrBuildMaterial("G4_Al");
+   fCassetteMat = manager->FindOrBuildMaterial("G4_Al");
    //fWindowMat = manager->FindOrBuildMaterial("G4_Ni");
    fPlateMat = manager->FindOrBuildMaterial("G4_POLYSTYRENE");
    fCellMat = manager->BuildMaterialWithNewDensity("G4_WATER_MODIFIED","G4_WATER",
                                                    1.1*g/cm/cm/cm);
-   fAttMat = fPlateMat;
+   fAttMat = fWindowMat;
+   fWaterMat = manager->FindOrBuildMaterial("G4_WATER");
 }
 
 G4VPhysicalVolume *BIDetectorConstruction::Construct()
@@ -122,6 +139,14 @@ G4VPhysicalVolume *BIDetectorConstruction::Construct()
    fAirGapPV = new G4PVPlacement(nullptr, airPos, airLV, "Air", fWorldLV,
    false, 0, fCheckOverlap);
 
+   G4LogicalVolume *cassetteLV = ConstructCassette();
+   G4double cassetteZ = (fAirGapT + fWindowT / 2.) - fCassetteH / 2. + fCassetteBottomT;
+   G4ThreeVector cassettePos = G4ThreeVector(0., 0., cassetteZ);
+   fCassettePV = new G4PVPlacement(nullptr, cassettePos, cassetteLV, "Cassette", fWorldLV,
+   false, 0, fCheckOverlap);
+
+
+
    G4LogicalVolume *attLV[kAtt];
    G4double attR = 75.*mm;
    G4double attOffset = -fAirGapT / 2.;
@@ -137,18 +162,41 @@ G4VPhysicalVolume *BIDetectorConstruction::Construct()
    }
 
    G4LogicalVolume *plateLV = ConstructPlate();
-   G4double plateZ = airZ + (fAirGapT + fPlateT) / 2.;
+   G4double plateZ = 5.*mm - (fAirGapT - fPlateT) / 2.;
    G4ThreeVector platePos = G4ThreeVector(0., 0., plateZ);
-   fPlatePV = new G4PVPlacement(nullptr, platePos, plateLV, "Plate", fWorldLV,
+   fPlatePV = new G4PVPlacement(nullptr, platePos, plateLV, "Plate", airLV,
                                 false, 0, fCheckOverlap);
 
    G4LogicalVolume *cellLV = ConstructCell();
    G4double cellZ = plateZ + (fPlateT + fCellT) / 2.;
    G4ThreeVector cellPos = G4ThreeVector(0., 0., cellZ);
-   fCellPV = new G4PVPlacement(nullptr, cellPos, cellLV, "Cell", fWorldLV,
+   fCellPV = new G4PVPlacement(nullptr, cellPos, cellLV, "Cell", airLV,
                                false, 0, fCheckOverlap);
 
+   G4LogicalVolume *waterLV = ConstructWater();
+   G4double waterZ = cellZ + (fCellT + fWaterT) / 2.;
+   G4ThreeVector waterPos = G4ThreeVector(0., 0., waterZ);
+   fWaterPV = new G4PVPlacement(nullptr, waterPos, waterLV, "Water", airLV,
+                                false, 0, fCheckOverlap);
+
    return worldPV;
+}
+
+G4LogicalVolume *BIDetectorConstruction::ConstructCassette()
+{
+   G4Box *cassetteS = new G4Box("Cassette", fCassetteL / 2., fCassetteW / 2., fCassetteH / 2.);
+   G4Box *openS = new G4Box("Open", fPlateL / 2., fPlateW / 2., fCassetteH / 2.);
+   G4ThreeVector openPos(0., 0., -3.*mm);
+   G4SubtractionSolid *subS = new G4SubtractionSolid("Cassette", cassetteS, openS, nullptr, openPos);
+
+   G4LogicalVolume *cassetteLV = new G4LogicalVolume(subS, fCassetteMat, "Cassette");
+
+   G4VisAttributes *visAttributes = new G4VisAttributes(G4Colour::Yellow());
+   visAttributes->SetVisibility(true);
+   cassetteLV->SetVisAttributes(visAttributes);
+   fVisAttributes.push_back(visAttributes);
+
+   return cassetteLV;
 }
 
 G4LogicalVolume *BIDetectorConstruction::ConstructPlate()
@@ -169,7 +217,7 @@ G4LogicalVolume *BIDetectorConstruction::ConstructWindow()
    G4Box *windowS = new G4Box("Window", fWindowL / 2., fWindowW / 2., fWindowT / 2.);
    G4LogicalVolume *windowLV = new G4LogicalVolume(windowS, fWindowMat, "Window");
    
-   G4VisAttributes *visAttributes = new G4VisAttributes(G4Colour::Blue());
+   G4VisAttributes *visAttributes = new G4VisAttributes(G4Colour::Red());
    visAttributes->SetVisibility(true);
    windowLV->SetVisAttributes(visAttributes);
    fVisAttributes.push_back(visAttributes);
@@ -192,10 +240,18 @@ G4LogicalVolume *BIDetectorConstruction::ConstructAirGap()
 
 G4LogicalVolume *BIDetectorConstruction::ConstructAtt(G4double R, G4double T)
 {
+   G4LogicalVolume *attLV;
+   
    G4Tubs *attS = new G4Tubs("layer", R - 1.*mm, R, T / 2., 0., 360.*deg);
-   G4LogicalVolume *attLV = new G4LogicalVolume(attS, fAttMat, "Att");
+   
+   if(R > fAirGapW / 2.){
+      G4Box *airS = new G4Box("Air", fAirGapL / 2., fAirGapW / 2., fAirGapT);
+      G4IntersectionSolid *intS = new G4IntersectionSolid("Att", attS, airS);
+      attLV = new G4LogicalVolume(intS, fAttMat, "Att");
+   }
+   else attLV = new G4LogicalVolume(attS, fAttMat, "Att");
 
-   G4VisAttributes *visAttributes = new G4VisAttributes(G4Colour::Yellow());
+   G4VisAttributes *visAttributes = new G4VisAttributes(G4Colour::Green());
    visAttributes->SetVisibility(true);
    attLV->SetVisAttributes(visAttributes);
    fVisAttributes.push_back(visAttributes);
@@ -206,10 +262,22 @@ G4LogicalVolume *BIDetectorConstruction::ConstructAtt(G4double R, G4double T)
 G4LogicalVolume *BIDetectorConstruction::ConstructCell()
 {
    G4Box *cellS = new G4Box("Cell", fCellL / 2., fCellW / 2., fCellT / 2.);
-   //G4Tubs *cellS = new G4Tubs("Cell", 0., fCellR, fCellT / 2., 0., 360.*deg);
    G4LogicalVolume *cellLV = new G4LogicalVolume(cellS, fCellMat, "Cell");
    
    G4VisAttributes *visAttributes = new G4VisAttributes(G4Colour::Magenta());
+   visAttributes->SetVisibility(true);
+   cellLV->SetVisAttributes(visAttributes);
+   fVisAttributes.push_back(visAttributes);
+
+   return cellLV;
+}
+
+G4LogicalVolume *BIDetectorConstruction::ConstructWater()
+{
+   G4Box *cellS = new G4Box("Water", fWaterL / 2., fWaterW / 2., fWaterT / 2.);
+   G4LogicalVolume *cellLV = new G4LogicalVolume(cellS, fWaterMat, "Water");
+   
+   G4VisAttributes *visAttributes = new G4VisAttributes(G4Colour::Blue());
    visAttributes->SetVisibility(true);
    cellLV->SetVisAttributes(visAttributes);
    fVisAttributes.push_back(visAttributes);

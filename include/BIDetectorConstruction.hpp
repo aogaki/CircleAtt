@@ -37,22 +37,32 @@ private:
    void DefineCommands();
    G4GenericMessenger *fMessenger;
    G4VPhysicalVolume *fWindowPV;
+   G4VPhysicalVolume *fCassettePV;
    G4VPhysicalVolume *fAirGapPV;
    G4VPhysicalVolume *fPlatePV;
    G4VPhysicalVolume *fCellPV;
+   G4VPhysicalVolume *fWaterPV;
 
    // Materials
    void DefineMaterial();
    G4Material *fVacuum;
    G4Material *fAir;
    G4Material *fWindowMat;
+   G4Material *fCassetteMat;
    G4Material *fPlateMat;
    G4Material *fCellMat;
    G4Material *fAttMat;
+   G4Material *fWaterMat;
    
    // Geometries
    // Do I really need all members? too much?
    void DefineGeoPar();
+   
+   G4LogicalVolume *ConstructCassette();
+   G4double fCassetteH;
+   G4double fCassetteL;
+   G4double fCassetteW;
+   G4double fCassetteBottomT;
    
    G4LogicalVolume *ConstructPlate();
    G4double fPlateT;
@@ -82,6 +92,11 @@ private:
    G4double fCellW;
    G4double fCellR;
    G4double fCellT;
+
+   G4LogicalVolume *ConstructWater();
+   G4double fWaterL;
+   G4double fWaterW;
+   G4double fWaterT;
 
    std::vector<G4VisAttributes *> fVisAttributes;
 };
