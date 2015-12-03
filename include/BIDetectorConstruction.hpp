@@ -15,7 +15,7 @@
 class BIDetectorConstruction : public G4VUserDetectorConstruction
 {
 public:
-   BIDetectorConstruction();
+   BIDetectorConstruction(G4String);
    virtual ~BIDetectorConstruction();
 
    virtual G4VPhysicalVolume *Construct();
@@ -28,6 +28,8 @@ public:
    void SetAttMat(G4String matName);
    
 private:
+   G4String fInName;
+   
    G4LogicalVolume *fWorldLV;
    G4bool fCheckOverlap;
 

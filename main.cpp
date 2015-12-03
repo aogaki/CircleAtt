@@ -37,6 +37,7 @@ namespace
       G4cerr << " ./LG [-m macro filename]\n"
              << " -a Show all trajectory (default show only ploton)\n"
              << " -o Output file name \n"
+             << " -i Input file name \n"
              << G4endl;
    }
 }
@@ -46,10 +47,12 @@ int main(int argc, char **argv)
    G4String macro = "";
    G4bool showAll = false;
    G4String outName = "result";
+   G4String inName = "att.dat";
    for (G4int i = 1; i < argc; i++) {
       if (G4String(argv[i]) == "-m") macro = argv[++i];
       else if (G4String(argv[i]) == "-a") showAll = true;
       else if (G4String(argv[i]) == "-o") outName = argv[++i];
+      else if (G4String(argv[i]) == "-i") inName = argv[++i];
       else {
          PrintUsage();
          return 1;
@@ -82,7 +85,7 @@ int main(int argc, char **argv)
    // Set mandatory initialization classes
    //
    // Detector construction
-   runManager->SetUserInitialization(new BIDetectorConstruction());
+   runManager->SetUserInitialization(new BIDetectorConstruction(inName));
    G4cout << "Here" << G4endl;
    // Physics list
    //G4VModularPhysicsList *physicsList = new FTFP_BERT;

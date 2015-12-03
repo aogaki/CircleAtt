@@ -25,7 +25,7 @@
 #include "BICommonSD.hpp"
 
 
-BIDetectorConstruction::BIDetectorConstruction()
+BIDetectorConstruction::BIDetectorConstruction(G4String name)
    : G4VUserDetectorConstruction(),
      fWorldLV(nullptr),
      fWindowPV(nullptr),
@@ -40,7 +40,8 @@ BIDetectorConstruction::BIDetectorConstruction()
      fAttMat(nullptr)
 {
    fCheckOverlap = true;
-
+   fInName = name;
+   
    ReadAttData();
    for(G4int i = 0; i < kAtt; i++) fAttPV[i] = nullptr;
    
@@ -314,7 +315,7 @@ void BIDetectorConstruction::SetAttMat(G4String matName)
 
 void BIDetectorConstruction::ReadAttData()
 {
-   std::ifstream fin("att.dat");
+   std::ifstream fin(fInName);
    if(!fin.is_open()){
       G4cout << "Attenuator data file not found." << G4endl;
       exit(0);
