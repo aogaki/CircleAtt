@@ -15,5 +15,6 @@ Makefile
 *~
 tmp.*
 result*.root
+tmp*.root
 Makefile
 
