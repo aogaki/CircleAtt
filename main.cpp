@@ -36,6 +36,7 @@ namespace
       G4cerr << " Usage: " << G4endl;
       G4cerr << " ./LG [-m macro filename]\n"
              << " -a Show all trajectory (default show only ploton)\n"
+             << " -o Output file name \n"
              << G4endl;
    }
 }
@@ -44,15 +45,21 @@ int main(int argc, char **argv)
 {
    G4String macro = "";
    G4bool showAll = false;
+   G4String outName = "result";
    for (G4int i = 1; i < argc; i++) {
       if (G4String(argv[i]) == "-m") macro = argv[++i];
       else if (G4String(argv[i]) == "-a") showAll = true;
+      else if (G4String(argv[i]) == "-o") outName = argv[++i];
       else {
          PrintUsage();
          return 1;
       }
    }
 
+   G4String suffix = ".root";
+   outName.remove(outName.index(suffix));
+
+   
    // Remove?
    // Choose the Random engine
    CLHEP::HepRandom::setTheEngine(new CLHEP::RanecuEngine);
@@ -89,7 +96,7 @@ int main(int argc, char **argv)
    runManager->SetUserInitialization(physicsList);
 
    // Primary generator action and User action intialization
-   runManager->SetUserInitialization(new BIActionInitialization());
+   runManager->SetUserInitialization(new BIActionInitialization(outName));
 
    // Initialize G4 kernel
    //

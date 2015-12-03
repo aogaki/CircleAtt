@@ -6,7 +6,7 @@
 #include "BIRunAction.hpp"
 
 
-BIRunAction::BIRunAction()
+BIRunAction::BIRunAction(G4String name)
    : G4UserRunAction()
 {
    G4AnalysisManager *anaMan = G4AnalysisManager::Instance();
@@ -20,6 +20,8 @@ BIRunAction::BIRunAction()
    anaMan->CreateH2("HisPlate", "Deposited Energy",
                     G4int(cellL * 10), -cellL / 2., cellL / 2,
                     G4int(cellW * 10), -cellW / 2., cellW / 2);
+
+   fOutName = name;
 }
 
 BIRunAction::~BIRunAction()
@@ -30,8 +32,7 @@ BIRunAction::~BIRunAction()
 void BIRunAction::BeginOfRunAction(const G4Run *)
 {
     G4AnalysisManager *anaMan = G4AnalysisManager::Instance();
-    G4String fileName = "result";
-    anaMan->OpenFile(fileName);
+    anaMan->OpenFile(fOutName);
 }
 
 void BIRunAction::EndOfRunAction(const G4Run *)

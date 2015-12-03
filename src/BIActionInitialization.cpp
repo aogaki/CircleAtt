@@ -4,21 +4,23 @@
 #include "BIEventAction.hpp"
 
 
-BIActionInitialization::BIActionInitialization()
+BIActionInitialization::BIActionInitialization(G4String name)
    : G4VUserActionInitialization()
-{}
+{
+   fOutName = name;
+}
 
 BIActionInitialization::~BIActionInitialization()
 {}
 
 void BIActionInitialization::BuildForMaster() const
 {
-   SetUserAction(new BIRunAction);
+   SetUserAction(new BIRunAction(fOutName));
 }
 
 void BIActionInitialization::Build() const
 {
    SetUserAction(new BIPrimaryGeneratorAction());
-   SetUserAction(new BIRunAction());
+   SetUserAction(new BIRunAction(fOutName));
    SetUserAction(new BIEventAction());
 }
