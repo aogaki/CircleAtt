@@ -38,8 +38,29 @@ namespace
              << " -a Show all trajectory (default show only ploton)\n"
              << " -o Output file name \n"
              << " -i Input file name \n"
+             << " -s Random number seed \n"
              << G4endl;
    }
+}
+
+unsigned int GetRandomSeed()
+{
+   unsigned int seed; 
+   std::ifstream file ("/dev/urandom", std::ios::binary);
+   if (file.is_open()){
+      char *memblock;
+      int size = sizeof(int);
+      memblock = new char[size];
+      file.read(memblock, size);
+      file.close();
+      seed = *reinterpret_cast<int*>(memblock);
+      delete[] memblock;
+   }
+   else{
+      seed = 0;
+   }
+
+   return seed;
 }
 
 int main(int argc, char **argv)
@@ -48,11 +69,13 @@ int main(int argc, char **argv)
    G4bool showAll = false;
    G4String outName = "result";
    G4String inName = "att.dat";
+   unsigned int seed = 0;
    for (G4int i = 1; i < argc; i++) {
       if (G4String(argv[i]) == "-m") macro = argv[++i];
       else if (G4String(argv[i]) == "-a") showAll = true;
       else if (G4String(argv[i]) == "-o") outName = argv[++i];
       else if (G4String(argv[i]) == "-i") inName = argv[++i];
+      else if (G4String(argv[i]) == "-s") seed = atoi(argv[++i]);
       else {
          PrintUsage();
          return 1;
@@ -66,14 +89,16 @@ int main(int argc, char **argv)
    // Remove?
    // Choose the Random engine
    CLHEP::HepRandom::setTheEngine(new CLHEP::RanecuEngine);
-   G4int seed = time(0);
+   if(seed == 0) seed = GetRandomSeed();
    G4cout << "\nseed = " << seed << G4endl;
    CLHEP::HepRandom::setTheSeed(seed);
    G4Random::setTheSeed(seed);
 
+   exit(0);
+   
    // Construct the default run manager
    //
-
+/*
 #ifdef G4MULTITHREADED
    G4MTRunManager *runManager = new G4MTRunManager();
    runManager->SetNumberOfThreads(G4Threading::G4GetNumberOfCores());
@@ -81,7 +106,11 @@ int main(int argc, char **argv)
 #else
    G4RunManager *runManager = new G4RunManager();
 #endif
+*/
+   // Make only one thread for the Grid
+   G4RunManager *runManager = new G4RunManager();
 
+   
    // Set mandatory initialization classes
    //
    // Detector construction

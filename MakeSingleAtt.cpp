@@ -1,8 +1,9 @@
 const Int_t kAtt = 75;
 
-void MakeAtt(Int_t plate, Int_t T)
+void MakeSingleAtt(Int_t plate, Int_t T)
 {
-   ofstream fout("att.dat");
+   TString fileName = "att" + to_string(plate) + "T" + to_string(T) + ".dat";
+   ofstream fout(fileName);
    for(Int_t i = 0; i < kAtt; i++){
       if(i == plate) fout << T << endl;
       else fout << 0 << endl;
