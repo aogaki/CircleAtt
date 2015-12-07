@@ -93,8 +93,6 @@ int main(int argc, char **argv)
    G4cout << "\nseed = " << seed << G4endl;
    CLHEP::HepRandom::setTheSeed(seed);
    G4Random::setTheSeed(seed);
-
-   exit(0);
    
    // Construct the default run manager
    //

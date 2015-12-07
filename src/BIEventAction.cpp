@@ -59,8 +59,11 @@ void BIEventAction::EndOfEventAction(const G4Event *event)
       BICommonHit *newHit = (*hitsCollection)[iHit];
       G4double depositEnergy = newHit->GetDepositEnergy();
       G4ThreeVector position = newHit->GetPosition();
-      
-      anaMan->FillH2(0, position.x() / mm, position.y() / mm, depositEnergy);
+
+      G4double x = position.x();
+      G4double y = position.y();
+      //G4double dist = sqrt(x*x + y*y);
+      anaMan->FillH2(0, x, y, depositEnergy);
       
    }
 
