@@ -385,7 +385,7 @@ void BIDetectorConstruction::SetAttMat(G4String matName)
 #include <sstream>
 G4double stol(std::string buf)
 {
-   istringstream is;
+   std::istringstream is;
    is.str(buf);
    G4double retVal;
    is >> retVal;
