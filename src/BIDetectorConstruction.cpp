@@ -381,6 +381,18 @@ void BIDetectorConstruction::SetAttMat(G4String matName)
    }
 }
 
+#ifdef NOTCPP11
+#include <sstream>
+G4double stol(std::string buf)
+{
+   istringstream is;
+   is.str(buf);
+   G4double retVal;
+   is >> retVal;
+   return retVal;
+}
+#endif
+
 void BIDetectorConstruction::ReadAttData()
 {
    std::ifstream fin(fInName);
