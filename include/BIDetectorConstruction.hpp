@@ -2,7 +2,7 @@
 #define BIDetectorConstruction_h 1
 
 #ifdef NOTCPP11
-#define nullptr=NULL
+#define nullptr NULL
 #endif
 
 #include <vector>
