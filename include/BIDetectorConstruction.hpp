@@ -1,6 +1,10 @@
 #ifndef BIDetectorConstruction_h
 #define BIDetectorConstruction_h 1
 
+#ifdef NOTCPP11
+#define nullptr=NULL
+#endif
+
 #include <vector>
 
 #include "G4VUserDetectorConstruction.hh"
