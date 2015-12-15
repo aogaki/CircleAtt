@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#for t in `cat thickness`
-for t in `cat testT`
+for t in `cat thickness`
+#for t in `cat testT`
 do
     for((i=0;i<75;i++))
     do
