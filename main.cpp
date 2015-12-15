@@ -96,7 +96,7 @@ int main(int argc, char **argv)
    
    // Construct the default run manager
    //
-/*
+
 #ifdef G4MULTITHREADED
    G4MTRunManager *runManager = new G4MTRunManager();
    runManager->SetNumberOfThreads(G4Threading::G4GetNumberOfCores());
@@ -104,9 +104,6 @@ int main(int argc, char **argv)
 #else
    G4RunManager *runManager = new G4RunManager();
 #endif
-*/
-   // Make only one thread for the Grid
-   G4RunManager *runManager = new G4RunManager();
 
    
    // Set mandatory initialization classes
