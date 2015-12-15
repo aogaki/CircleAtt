@@ -19,8 +19,8 @@ BIRunAction::BIRunAction(G4String name)
    //G4int nStep = G4int(10 * sqrt(cellL*cellL + cellW*cellW) / 2) + 1;
 
    anaMan->CreateH2("HisPlate", "Deposited Energy",
-                    G4int(cellL * 10), -cellL / 2., cellL / 2,
-                    G4int(cellW * 10), -cellW / 2., cellW / 2);
+                    G4int(cellL * 20), -cellL / 2., cellL / 2,
+                    G4int(cellW * 20), -cellW / 2., cellW / 2);
 
    fOutName = name;
 }
