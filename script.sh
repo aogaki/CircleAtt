@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#kEvents="10000000"
-kEvents="10000"
+kEvents="10000000"
+#kEvents="10000"
 kMat="Al"
 kT="1000"
 kD="300"
