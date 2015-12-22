@@ -97,9 +97,9 @@ void BIDetectorConstruction::DefineMaterial()
    // NIST database materials
    fVacuum = manager->FindOrBuildMaterial("G4_Galactic");
    fAir = manager->FindOrBuildMaterial("G4_AIR");
-   fWindowMat = manager->FindOrBuildMaterial("G4_Al");
+   //fWindowMat = manager->FindOrBuildMaterial("G4_Al");
    fCassetteMat = manager->FindOrBuildMaterial("G4_Al");
-   //fWindowMat = manager->FindOrBuildMaterial("G4_Ni");
+   fWindowMat = manager->FindOrBuildMaterial("G4_Ni");
    fPlateMat = manager->FindOrBuildMaterial("G4_POLYSTYRENE");
    fCellMat = manager->BuildMaterialWithNewDensity("G4_WATER_MODIFIED","G4_WATER",
                                                    1.1*g/cm/cm/cm);
