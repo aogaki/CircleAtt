@@ -1,6 +1,6 @@
 CMakeCache.txt
 CMakeFiles/
-Data/
+Data/Al/
 test/
 tmp/
 cmake_install.cmake
@@ -15,6 +15,7 @@ Makefile
 *~
 tmp.*
 result*.root
+att*.dat
 tmp*.root
 Makefile
 tools/*.dat
