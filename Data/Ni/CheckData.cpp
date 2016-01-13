@@ -9,14 +9,15 @@
 
 
 TH2D *HisPlate;
+TH1D *HisDistance;
 TH2D *HisDose;
 
 Double_t GetDistance(Double_t x1, Double_t y1, Double_t x2, Double_t y2)
 {
-  Double_t x = fabs(x1 - x2);
-  Double_t y = fabs(y1 - y2);
-  Double_t distance = sqrt(x*x + y*y);
-  return distance;
+   Double_t x = fabs(x1 - x2);
+   Double_t y = fabs(y1 - y2);
+   Double_t distance = sqrt(x * x + y * y);
+   return distance;
 }
 
 Double_t GetDose(Double_t depEne)
@@ -34,40 +35,42 @@ Double_t GetDose(Double_t depEne)
    Double_t dose = eneJ / mass; // Gy = J / kg
 
    dose *= 1e+2; // 10^10 -> 10^12
-   
+
    return dose;
 }
 
 void CheckData(TString fileName = "./reference.root")
 {
-  TFile *file = new TFile(fileName, "OPEN");
-  HisPlate = (TH2D*)file->Get("HisPlate");
+   TFile *file = new TFile(fileName, "OPEN");
+   HisPlate = (TH2D *)file->Get("HisPlate");
 
-  TAxis *xAxis = HisPlate->GetXaxis();
-  TAxis *yAxis = HisPlate->GetYaxis();
-  const Int_t nX = xAxis->GetNbins();
-  const Int_t nY = yAxis->GetNbins();
-  Int_t xCenter = 0.5 + nX / 2.;
-  Int_t yCenter = 0.5 + nY / 2.;
+   TAxis *xAxis = HisPlate->GetXaxis();
+   TAxis *yAxis = HisPlate->GetYaxis();
+   const Int_t nX = xAxis->GetNbins();
+   const Int_t nY = yAxis->GetNbins();
+   Int_t xCenter = 0.5 + nX / 2.;
+   Int_t yCenter = 0.5 + nY / 2.;
 
-  cout << xCenter <<"\t"<< xAxis->GetNbins() <<"\n"
-       << yCenter <<"\t"<< yAxis->GetNbins() << endl;
-  
-  HisDose = new TH2D("HisDose", "test", 650, 0., 650., 100000, 0., 10.);
+   cout << xCenter << "\t" << xAxis->GetNbins() << "\n"
+        << yCenter << "\t" << yAxis->GetNbins() << endl;
 
-  for(Int_t x = 1; x <= nX; x++){
-    for(Int_t y = 1; y <= nY; y++){
-      Double_t distance = GetDistance(x, y, xCenter, yCenter);
-      if(distance > 2.5){
-	Double_t dose = GetDose(HisPlate->GetBinContent(x, y));
-	if(dose > 0.) HisDose->Fill(Int_t(distance / 2.), dose);
+   HisDistance = new TH1D("HisDistance", "the unit is mesh", 1300, 0., 1300.);
+   HisDose = new TH2D("HisDose", "test", 1300, 0., 1300., 3000, 0., 30.);
+
+   for (Int_t x = 1; x <= nX; x++) {
+      for (Int_t y = 1; y <= nY; y++) {
+         Double_t distance = GetDistance(x, y, xCenter, yCenter);
+         if (distance > 2.5) {
+            HisDistance->Fill(distance);
+            Double_t dose = GetDose(HisPlate->GetBinContent(x, y));
+            if (dose > 0.) HisDose->Fill(distance, dose);
+         }
       }
-    }
-  }
-  
-  if(!gROOT->IsBatch()){
-    new TBrowser();
-    HisDose->Draw("COLZ");
-  }
+   }
+
+   if (!gROOT->IsBatch()) {
+      new TBrowser();
+      HisDose->Draw("COLZ");
+   }
 
 }
