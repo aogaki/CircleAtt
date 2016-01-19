@@ -67,7 +67,7 @@ void BIDetectorConstruction::DefineGeoPar()
    
    fWindowL = fPlateL;
    fWindowW = fPlateW;
-   fWindowT = 0.5*mm;
+   fWindowT = 1.0*mm;
 
    fCassetteL = 163.6*mm; // temporary
    fCassetteW = 118.4*mm; // temporary

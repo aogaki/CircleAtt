@@ -17,6 +17,7 @@ tmp.*
 result*.root
 dose*.root
 distance*.root
+graph*.root
 att*.dat
 tmp*.root
 Makefile
